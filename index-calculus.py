@@ -18,3 +18,7 @@ def is_prime(n: int) -> bool:
             return False
         i += 6
     return True
+
+def generate_factor_base(B: int) -> List[int]:
+    return [p for p in range(2, B + 1) if is_prime(p)]
+
