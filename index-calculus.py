@@ -92,3 +92,45 @@ def gaussian_elimination_mod(A: List[List[int]], b: List[int], mod: int) -> Opti
 
 def verify_result(alpha: int, x: int, beta: int, p: int) -> bool:
     return pow(alpha, x, p) == beta % p
+
+def index_calculus(alpha: int, beta: int, n: int, p: int, c: float = 3.38, extra_equations: int = 30) -> Optional[int]:
+    B = calculate_factor_base_bound(n, c)
+    factor_base = generate_factor_base(B)
+    t = len(factor_base)
+    print(f"Факторна база розміром {t}: {factor_base[:10]}{'...' if t > 10 else ''}")
+
+    A, b = [], []
+    needed = t + extra_equations
+    while len(A) < needed:
+        k = random.randint(0, n - 1)
+        val = pow(alpha, k, p)
+        factorization = trial_factorization(val, factor_base)
+        if factorization:
+            A.append([factorization.get(p_, 0) % n for p_ in factor_base])
+            b.append(k % n)
+            if len(A) % 10 == 0:
+                print(f"Зібрано {len(A)} рівнянь")
+
+    logs = gaussian_elimination_mod(A, b, n)
+    if logs is None:
+        print("Система не має розв’язку")
+        return None
+
+    print("Отримані логарифми факторної бази:")
+    for p_, log in zip(factor_base, logs):
+        print(f"log_{alpha}({p_}) ≡ {log} (mod {n})")
+
+    for attempt in range(1000):  # збільшено кількість спроб
+        l = random.randint(0, n - 1)
+        val = (beta * pow(alpha, l, p)) % p
+        factorization = trial_factorization(val, factor_base)
+        if factorization:
+            result = -l
+            for i, p_ in enumerate(factor_base):
+                result += logs[i] * factorization.get(p_, 0)
+            x = result % n
+            if verify_result(alpha, x, beta, p):
+                return x
+
+    print("Не вдалося знайти коректний логарифм β")
+    return None
