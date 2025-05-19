@@ -2,6 +2,7 @@ import random
 import math
 import time
 from typing import List, Dict, Optional
+import multiprocessing as mp
 
 
 def is_prime(n: int) -> bool:
@@ -102,7 +103,7 @@ def worker(alpha: int, p: int, n: int, factor_base: List[int]) -> Optional[tuple
         return (row, k % n)
     return None
 
-def index_calculus(alpha: int, beta: int, n: int, p: int, c: float = 3.38, extra_equations: int = 30) -> Optional[int]:
+def index_calculus_parallel(alpha: int, beta: int, n: int, p: int, queue_size: int, num_processes: int = 2, c: float = 3.38, extra_equations: int = 30) -> Optional[int]:
     B = calculate_factor_base_bound(n, c)
     factor_base = generate_factor_base(B)
     t = len(factor_base)
@@ -110,16 +111,18 @@ def index_calculus(alpha: int, beta: int, n: int, p: int, c: float = 3.38, extra
 
     A, b = [], []
     needed = t + extra_equations
-    while len(A) < needed:
-        result = worker(alpha, p, n, factor_base)
-        if result:
-            row, k_mod = result
-            A.append(row)
-            b.append(k_mod)
-        if len(A) % 10 == 0:
-            print(f"Зібрано {len(A)} рівнянь")
-        if len(A) >= needed:
-            break
+    with mp.Pool(processes=num_processes) as pool:
+        while len(A) < needed:
+            tasks = [pool.apply_async(worker, args=(alpha, p, n, factor_base)) for _ in range(queue_size)]
+            for task in tasks:
+                result = task.get()
+                if result:
+                    row, k_mod = result
+                    A.append(row)
+                    b.append(k_mod)
+                if len(A) >= needed:
+                    break
+        print(f"Зібрано {len(A)} рівняння")
 
     logs = gaussian_elimination_mod(A, b, n)
     if logs is None:
@@ -157,7 +160,7 @@ def main():
     print(f"n = {n}\n")
 
     start = time.time()
-    x = index_calculus(alpha, beta, n, p)
+    x = index_calculus_parallel(alpha, beta, n, p, 4)
     end = time.time()
 
     if x is not None:
