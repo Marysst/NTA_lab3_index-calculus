@@ -41,3 +41,9 @@ def trial_factorization(num: int, factor_base: List[int]) -> Optional[Dict[int, 
     if temp == 1:
         return factorization
     return None
+
+def mod_inverse(a: int, m: int) -> int:
+    try:
+        return pow(a, -1, m)
+    except ValueError:
+        raise ValueError(f"mod_inverse: {a} has no inverse mod {m}")
