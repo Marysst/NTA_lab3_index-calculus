@@ -47,3 +47,45 @@ def mod_inverse(a: int, m: int) -> int:
         return pow(a, -1, m)
     except ValueError:
         raise ValueError(f"mod_inverse: {a} has no inverse mod {m}")
+
+def gaussian_elimination_mod(A: List[List[int]], b: List[int], mod: int) -> Optional[List[int]]:
+    n = len(A)
+    m = len(A[0])
+    A = [row[:] for row in A]
+    b = b[:]
+
+    for col in range(m):
+        pivot_row = None
+        for row in range(col, n):
+            if A[row][col] % mod != 0:
+                try:
+                    mod_inverse(A[row][col], mod)
+                    pivot_row = row
+                    break
+                except ValueError:
+                    continue
+        if pivot_row is None:
+            continue
+        if pivot_row != col:
+            A[col], A[pivot_row] = A[pivot_row], A[col]
+            b[col], b[pivot_row] = b[pivot_row], b[col]
+        inv = mod_inverse(A[col][col], mod)
+        for j in range(m):
+            A[col][j] = (A[col][j] * inv) % mod
+        b[col] = (b[col] * inv) % mod
+        for row in range(n):
+            if row != col and A[row][col] != 0:
+                factor = A[row][col]
+                for j in range(m):
+                    A[row][j] = (A[row][j] - factor * A[col][j]) % mod
+                b[row] = (b[row] - factor * b[col]) % mod
+
+    solution = [0] * m
+    for row in range(n):
+        leading_col = next((i for i, val in enumerate(A[row]) if val != 0), None)
+        if leading_col is None:
+            if b[row] % mod != 0:
+                return None
+        else:
+            solution[leading_col] = b[row] % mod
+    return solution
