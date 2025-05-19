@@ -27,3 +27,17 @@ def calculate_factor_base_bound(n: int, c: float = 3.38) -> int:
     log_log_n = math.log(log_n)
     B = c * math.exp(0.5 * math.sqrt(log_n * log_log_n))
     return int(B)
+
+def trial_factorization(num: int, factor_base: List[int]) -> Optional[Dict[int, int]]:
+    factorization = {}
+    temp = num
+    for p in factor_base:
+        count = 0
+        while temp % p == 0:
+            temp //= p
+            count += 1
+        if count > 0:
+            factorization[p] = count
+    if temp == 1:
+        return factorization
+    return None
