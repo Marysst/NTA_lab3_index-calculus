@@ -89,3 +89,6 @@ def gaussian_elimination_mod(A: List[List[int]], b: List[int], mod: int) -> Opti
         else:
             solution[leading_col] = b[row] % mod
     return solution
+
+def verify_result(alpha: int, x: int, beta: int, p: int) -> bool:
+    return pow(alpha, x, p) == beta % p
