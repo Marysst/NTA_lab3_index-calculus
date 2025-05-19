@@ -120,7 +120,7 @@ def index_calculus(alpha: int, beta: int, n: int, p: int, c: float = 3.38, extra
     for p_, log in zip(factor_base, logs):
         print(f"log_{alpha}({p_}) ≡ {log} (mod {n})")
 
-    for attempt in range(1000):  # збільшено кількість спроб
+    for attempt in range(1000):  
         l = random.randint(0, n - 1)
         val = (beta * pow(alpha, l, p)) % p
         factorization = trial_factorization(val, factor_base)
