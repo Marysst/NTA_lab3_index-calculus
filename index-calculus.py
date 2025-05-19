@@ -22,3 +22,8 @@ def is_prime(n: int) -> bool:
 def generate_factor_base(B: int) -> List[int]:
     return [p for p in range(2, B + 1) if is_prime(p)]
 
+def calculate_factor_base_bound(n: int, c: float = 3.38) -> int:
+    log_n = math.log(n)
+    log_log_n = math.log(log_n)
+    B = c * math.exp(0.5 * math.sqrt(log_n * log_log_n))
+    return int(B)
