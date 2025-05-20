@@ -1,6 +1,7 @@
 import random
 import math
 import time
+import sys
 from typing import List, Dict, Optional
 
 
@@ -135,32 +136,38 @@ def index_calculus(alpha: int, beta: int, n: int, p: int, c: float = 3.38, extra
     print("Не вдалося знайти коректний логарифм β")
     return None
 
-def main():
-    p = 9583882907
-    alpha = 228791781
-    beta = 1973175995
-    n = p - 1
-    print("=== Алгоритм Index-Calculus ===")
-    print(f"p = {p}")
-    print(f"α = {alpha}")
-    print(f"β = {beta}")
-    print(f"n = {n}\n")
-
-    start = time.time()
-    x = index_calculus(alpha, beta, n, p)
-    end = time.time()
-
-    if x is not None:
-        print(f"\nЗнайдено x = {x}")
-        if verify_result(alpha, x, beta, p):
-            print("Перевірка успішна: α^x ≡ β (mod p)")
-        else:
-            print("Помилка: α^x ≢ β (mod p)")
-    else:
-        print("Алгоритм не знайшов розв’язку")
-
-    print(f"\nЧас виконання: {end - start:.2f} с")
-
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 4:
+        print("Usage: python index_calculus.py <alpha> <beta> <p>")
+        sys.exit(1)
+
+    alpha = int(sys.argv[1])
+    beta = int(sys.argv[2])
+    p = int(sys.argv[3])
+    n = p - 1
+
+    try:
+        print("=== Алгоритм Index-Calculus ===")
+        print(f"p = {p}")
+        print(f"α = {alpha}")
+        print(f"β = {beta}")
+        print(f"n = {n}\n")
+
+        start = time.time()
+        x = index_calculus(alpha, beta, n, p)
+        end = time.time()
+
+        if x is not None:
+            print(f"\nЗнайдено x = {x}")
+            if verify_result(alpha, x, beta, p):
+                print("Перевірка успішна: α^x ≡ β (mod p)")
+            else:
+                print("Помилка: α^x ≢ β (mod p)")
+        else:
+            print("Алгоритм не знайшов розв’язку")
+
+        print(f"\nЧас виконання: {end - start:.2f} с")
+
+    except Exception as e:
+        print(f"Помилка: {e}")
